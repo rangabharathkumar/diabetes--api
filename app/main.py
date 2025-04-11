@@ -4,7 +4,7 @@ from app.model_utils import load_artifacts, preprocess_input, make_prediction
 
 app = FastAPI()
 
-# Load model and encoders
+# Load model and encoders once on startup
 model, scaler, gender_encoder, smoking_encoder = load_artifacts()
 
 class InputData(BaseModel):
@@ -26,5 +26,15 @@ def predict(data: InputData):
     input_dict = data.dict()
     processed = preprocess_input(input_dict, scaler, gender_encoder, smoking_encoder)
     prediction = make_prediction(model, processed)
+    
+    try:
+        proba = model.predict_proba(processed)[0][1]
+    except:
+        proba = "Not available"
+
     result = "Diabetic" if prediction[0] == 1 else "Non-Diabetic"
-    return {"prediction": result}
+    return {
+        "prediction": result,
+        "confidence": proba,
+        "raw_input": input_dict
+    }
