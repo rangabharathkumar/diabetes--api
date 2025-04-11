@@ -23,7 +23,11 @@ def preprocess_input(data, scaler, gender_encoder, smoking_encoder):
         data["Blood_Glucose_Level"]
     ]
 
+    print("Raw features:", features)
+
     scaled = scaler.transform([features])
+    print("Scaled input:", scaled)
+
     return scaled
 
 def make_prediction(model, processed_data):
